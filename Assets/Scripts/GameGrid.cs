@@ -36,7 +36,7 @@ namespace ConnectFour.Gameplay
 
 			for ( int col = 0; col < m_columnCount; ++col )
 			{
-				Column newColumn = CreateColumn( col );
+				Column newColumn = CreateColumn( col, m_rowCount );
 				m_columns[col] = newColumn;
 
 				for ( int row = 0; row < m_rowCount; ++row )
@@ -47,10 +47,12 @@ namespace ConnectFour.Gameplay
 			}
 		}
 
-		private Column CreateColumn( int columnIndex )
+		private Column CreateColumn( int columnIndex, int totalRows )
 		{
 			Column newColumn = Instantiate( m_columnPrefab, GridContainer );
 			newColumn.name = $"Column_{columnIndex}";
+
+			newColumn.SetMaxFillCount( totalRows );
 
 			return newColumn;
 		}
