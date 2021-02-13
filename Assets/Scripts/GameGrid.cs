@@ -21,6 +21,17 @@ namespace ConnectFour.Gameplay
 		private Cell[] m_cells = null;
 		private Column[] m_columns = null;
 
+		public Cell GetCell( int rowIndex, int columnIndex )
+		{
+			if ( m_cells == null || m_cells.Length <= 0 ) { return null; }
+
+			if ( rowIndex >= m_rowCount || columnIndex >= m_columnCount ) { return null; }
+			if ( rowIndex < 0 || columnIndex < 0 ) { return null; }
+
+			int idx = (columnIndex * m_rowCount) + rowIndex;
+			return m_cells[idx];
+		}
+
 		private void OnEnable()
 		{
 			if ( Application.isPlaying )
@@ -52,7 +63,7 @@ namespace ConnectFour.Gameplay
 			Column newColumn = Instantiate( m_columnPrefab, GridContainer );
 			newColumn.name = $"Column_{columnIndex}";
 
-			newColumn.SetMaxFillCount( totalRows );
+			newColumn.Config( columnIndex, totalRows );
 
 			return newColumn;
 		}
@@ -60,6 +71,7 @@ namespace ConnectFour.Gameplay
 		private Cell CreateCell( int rowIndex, int columnIndex, Transform group )
 		{
 			Cell newCell = Instantiate( m_cellPrefab, group );
+			newCell.transform.SetAsFirstSibling();
 			newCell.name = $"Cell_[{rowIndex}, {columnIndex}]";
 			
 			newCell.SetSize( GetPreferredCellSize() );
