@@ -16,8 +16,6 @@ namespace ConnectFour.Gameplay
 		public int ColumnIndex { get; private set; } = -1;
 
 		private int m_maxFill = -1;
-
-		private VerticalLayoutGroup m_layout = null;
 		private EventTrigger m_eventTrigger = null;
 
 		public void Config( int columnIndex, int maxFill )
@@ -52,7 +50,6 @@ namespace ConnectFour.Gameplay
 
 		private void Awake()
 		{
-			m_layout = GetComponent<VerticalLayoutGroup>();
 			m_eventTrigger = GetComponent<EventTrigger>();
 		}
 	}
