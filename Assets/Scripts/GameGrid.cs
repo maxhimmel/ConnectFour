@@ -59,30 +59,29 @@ namespace ConnectFour.Gameplay
 			{
 				CycleToNextTurn();
 			}
-			//else
-			//{
-			//	SetInteractionActive( false );
-			//}
 		}
 
 		private bool HandleGameover( int rowIndex, int columnIndex )
 		{
+			bool isGameover = false;
+
 			if ( IsWinner( rowIndex, columnIndex ) )
 			{
 				Debug.Log( $"Player {CurrentPlayer} has won!", this );
-
-				// TODO: Remove me (used to cycle players even when winning to debug/play easier
-				CycleToNextTurn();
-
-				return true;
+				isGameover = true;
 			}
 			else if ( IsDrawGame() )
 			{
 				Debug.Log( $"Draw game!", this );
-				return true;
+				isGameover = true;
 			}
 
-			return false;
+			if ( isGameover )
+			{
+				SetInteractionActive( false );
+			}
+
+			return isGameover;
 		}
 
 		private bool IsWinner( int rowIndex, int columnIndex )
@@ -229,25 +228,6 @@ namespace ConnectFour.Gameplay
 			return m_cells[idx];
 		}
 
-		public List<Vector2Int> GetAdjacentCellIndices( int rowIndex, int columnIndex )
-		{
-			List<Vector2Int> results = new List<Vector2Int>();
-			
-			for ( int col = columnIndex - 1; col <= columnIndex + 1; ++col )
-			{
-				for ( int row = rowIndex - 1; row <= rowIndex + 1; ++row )
-				{
-					if ( col < 0 || col >= m_columnCount ) { continue; }
-					if ( row < 0 || row >= m_rowCount ) { continue; }
-					if ( row == rowIndex && col == columnIndex ) { continue; }
-
-					results.Add( GridHelper.RowColVector( row, col ) );
-				}
-			}
-			
-			return results;
-		}
-
 		private void OnEnable()
 		{
 			if ( Application.isPlaying )
@@ -290,7 +270,7 @@ namespace ConnectFour.Gameplay
 			newCell.transform.SetAsFirstSibling();
 			newCell.name = $"Cell_[r.{rowIndex}, c.{columnIndex}]";
 
-			newCell.Config( GetPreferredCellSize(), rowIndex, columnIndex, GetAdjacentCellIndices( rowIndex, columnIndex ) );
+			newCell.Config( GetPreferredCellSize(), rowIndex, columnIndex );
 
 			return newCell;
 		}
