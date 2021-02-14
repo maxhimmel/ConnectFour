@@ -35,30 +35,31 @@ namespace ConnectFour.Gameplay
 
 		private void Start()
 		{
-			m_eventTrigger.AddEvent( EventTriggerType.PointerClick, OnClicked );
-			m_eventTrigger.AddEvent( EventTriggerType.PointerEnter, OnPointerEnter );
-			m_eventTrigger.AddEvent( EventTriggerType.PointerExit, OnPointerExit );
+			m_eventTrigger.AddEvent( EventTriggerType.PointerClick, d => PlacePiece() );
+			m_eventTrigger.AddEvent( EventTriggerType.PointerEnter, d => Highlight() );
+			m_eventTrigger.AddEvent( EventTriggerType.PointerExit, d => Deselect() );
 		}
 
-		private void OnClicked( BaseEventData data )
+		public void PlacePiece()
 		{
 			if ( IsFilled ) { return; }
 
-			//GameGrid grid = GetComponentInParent<GameGrid>();
-			//grid.PlacePiece( CurrentFillCount++, ColumnIndex );
 			Game.PlacePiece( CurrentFillCount++, ColumnIndex );
 
-			StartAnimatingColumn();
+			if ( m_colorBlinker.IsPlaying )
+			{
+				StartAnimatingColumn();
+			}
 		}
 
-		private void OnPointerEnter( BaseEventData data )
+		public void Highlight()
 		{
 			if ( IsFilled ) { return; }
 
 			StartAnimatingColumn();
 		}
-
-		private void OnPointerExit( BaseEventData data )
+		
+		public void Deselect()
 		{
 			if ( IsFilled ) { return; }
 

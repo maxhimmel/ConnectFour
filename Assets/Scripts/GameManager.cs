@@ -6,11 +6,14 @@ namespace ConnectFour
 {
 	using Utility;
 	using Gameplay;
+	using Gameplay.Users;
 
 	public class GameManager : Singleton<GameManager>
 	{
 		public event System.Action<int> OnPlayerTurnChangedEvent;
 
+		public bool IsInitialized { get; private set; } = false;
+		public bool IsGameover { get; private set; } = false;
 		public int CurrentPlayer { get; private set; } = 0;
 		public GameRules Rules { get { return m_rules; } }
 		public GameGrid Grid { get { return m_grid; } }
@@ -25,6 +28,7 @@ namespace ConnectFour
 
 		private GameGrid m_grid = null;
 		private IGameoverHandler m_gameoverHandler = null;
+		private UserController[] m_users = null;
 
 		public Color GetPlayerColor( int player )
 		{
@@ -46,6 +50,7 @@ namespace ConnectFour
 
 			if ( m_gameoverHandler.IsGameover( this ) )
 			{
+				IsGameover = true;
 				Grid.SetInteractionActive( false );
 			}
 			else
@@ -56,9 +61,12 @@ namespace ConnectFour
 
 		private void CycleToNextTurn()
 		{
+			UserController currentUser = m_users[CurrentPlayer];
+			currentUser.EndTurn();
+
 			CurrentPlayer = GetNextPlayer( CurrentPlayer );
 
-			OnPlayerTurnChangedEvent?.Invoke( CurrentPlayer );
+			StartPlayerTurn( CurrentPlayer );
 		}
 
 		private int GetNextPlayer( int currentPlayer )
@@ -66,13 +74,30 @@ namespace ConnectFour
 			return ++currentPlayer % GameRules.k_playerCount;
 		}
 
+		private void StartPlayerTurn( int player )
+		{
+			OnPlayerTurnChangedEvent?.Invoke( player );
+
+			UserController user = m_users[player];
+			user.StartTurn();
+		}
+
 		private IEnumerator Start()
 		{
 			m_grid.SetInteractionActive( false );
 			yield return new WaitForSeconds( m_startDelay );
 
-			OnPlayerTurnChangedEvent?.Invoke( CurrentPlayer );
-			m_grid.SetInteractionActive( true );
+			IsInitialized = true;
+
+			SetPlayerOrder();
+			StartPlayerTurn( CurrentPlayer );
+		}
+
+		private void SetPlayerOrder()
+		{
+			CurrentPlayer = m_rules.RandomPlayerOrder
+				? Random.Range( 0, GameRules.k_playerCount )
+				: 0;
 		}
 
 		protected override void Awake()
@@ -81,6 +106,7 @@ namespace ConnectFour
 
 			m_grid = GetComponentInChildren<GameGrid>();
 			m_gameoverHandler = GetComponentInChildren<GameoverHandler>();
+			m_users = GetComponentsInChildren<UserController>();
 		}
 	}
 }
