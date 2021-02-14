@@ -9,11 +9,13 @@ namespace ConnectFour
 	{
 		public const int k_playerCount = 2;
 
+		public bool RandomPlayerOrder { get { return m_randomPlayerOrder; } }
 		public int WinningConnectCount { get { return m_winningConnectCount; } }
 		public int RowCount { get { return m_rowCount; } }
 		public int ColumnCount { get { return m_columnCount; } }
 		public int TotalCellCount { get { return m_rowCount * m_columnCount; } }
 
+		[SerializeField] private bool m_randomPlayerOrder = true;
 		[SerializeField, Range( 2, 9 )] private int m_winningConnectCount = 4;
 
 		[Space]
