@@ -1,6 +1,8 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
+// https://forum.unity.com/threads/scripts-useful-4-6-scripts-collection.264161/?_ga=2.75128082.1031793323.1613158065-1227000029.1611520912
+
 public class uGUITools : MonoBehaviour {
 	[MenuItem("uGUI/Anchors to Corners %[")]
 	static void AnchorsToCorners(){
