@@ -7,9 +7,11 @@ namespace ConnectFour.Gameplay
 {
 	public class GameGrid : MonoBehaviour
 	{
-		private RectTransform GridContainer { get { return transform as RectTransform; } }
+		private RectTransform GridContainer { get { return m_container.transform as RectTransform; } }
 		private GameRules Rules { get { return Game.Rules; } }
 		private GameManager Game { get { return GameManager.Instance; } }
+
+		[SerializeField] private HorizontalLayoutGroup m_container = default;
 
 		[Header( "References" )]
 		[SerializeField] private Cell m_cellPrefab = default;
@@ -93,7 +95,8 @@ namespace ConnectFour.Gameplay
 
 		private float GetPreferredCellSize()
 		{
-			Vector2 gridSize = GridContainer.rect.size;
+			RectTransform gridRect = transform as RectTransform;
+			Vector2 gridSize = gridRect.rect.size;
 			Vector2 maxCellSize = new Vector2()
 			{
 				x = gridSize.x / Rules.ColumnCount,
@@ -113,10 +116,13 @@ namespace ConnectFour.Gameplay
 
 		private void DestroyGrid()
 		{
-			int childCount = GridContainer.childCount;
-			for ( int idx = 0; idx < childCount; ++idx )
+			if ( m_columns != null )
 			{
-				Destroy( GridContainer.GetChild( idx ).gameObject );
+				for ( int cdx = 0; cdx < m_columns.Length; ++cdx )
+				{
+					Column column = m_columns[cdx];
+					Destroy( column.gameObject );
+				}
 			}
 
 			m_cells = null;
