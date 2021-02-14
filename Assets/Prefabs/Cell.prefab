@@ -243,6 +243,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_fill: {fileID: 7532088042103839756}
+  m_adjacentCellColor: {r: 1, g: 0, b: 1, a: 1}
 --- !u!222 &5921298776050565442
 CanvasRenderer:
   m_ObjectHideFlags: 0
