@@ -33,19 +33,16 @@ namespace ConnectFour.Gameplay
 		private void OnClicked( BaseEventData data )
 		{
 			if ( IsFilled ) { return; }
-			//Debug.Log( $"[{name}] | Clicked!" );
-
+			//Debug.Log( $"[{name}] | Clicked!", this );
+			
 			GameGrid grid = GetComponentInParent<GameGrid>();
-			Cell cell = grid.GetCell( CurrentFillCount, ColumnIndex );
-			cell.Fill();
-
-			++CurrentFillCount;
+			grid.PlacePiece( CurrentFillCount++, ColumnIndex );
 		}
 
 		private void OnPointerEntered( BaseEventData data )
 		{
 			if ( IsFilled ) { return; }
-			//Debug.Log( $"[{name}] | Pointer entered!" );
+			//Debug.Log( $"[{name}] | Pointer entered!", this );
 		}
 
 		private void Awake()
