@@ -1,0 +1,17 @@
+{
+    "name": "ConnectFour.Editor",
+    "references": [
+        "GUID:baf85751b80ba994790a4061416a3702"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
