@@ -11,11 +11,18 @@ namespace ConnectFour
 	public class GameManager : Singleton<GameManager>
 	{
 		public event System.Action<int> OnPlayerTurnChangedEvent;
-		public event System.Action OnWonEvent;
-		public event System.Action OnDrawEvent;
+		public event System.Action OnWonEvent
+		{
+			add { if ( m_gameoverHandler != null ) { m_gameoverHandler.OnWonEvent += value; } }
+			remove { if ( m_gameoverHandler != null ) { m_gameoverHandler.OnWonEvent -= value; } }
+		}
+		public event System.Action OnDrawEvent
+		{
+			add { if ( m_gameoverHandler != null ) { m_gameoverHandler.OnDrawEvent += value; } }
+			remove { if ( m_gameoverHandler != null ) { m_gameoverHandler.OnDrawEvent -= value; } }
+		}
 
 		public bool IsInitialized { get; private set; } = false;
-		public bool IsGameover { get; private set; } = false;
 		public int CurrentPlayer { get; private set; } = 0;
 		public GameRules Rules { get { return m_rules; } }
 		public GameGrid Grid { get { return m_grid; } }
@@ -52,7 +59,6 @@ namespace ConnectFour
 
 			if ( m_gameoverHandler.IsGameover( this ) )
 			{
-				IsGameover = true;
 				Grid.SetInteractionActive( false );
 			}
 			else
@@ -88,16 +94,56 @@ namespace ConnectFour
 
 		private IEnumerator Start()
 		{
-			m_gameoverHandler.OnWonEvent += OnWonEvent;
-			m_gameoverHandler.OnDrawEvent += OnDrawEvent;
+			m_gameoverHandler.OnWonEvent += OnWon;
+			m_gameoverHandler.OnDrawEvent += OnDraw;
 
 			m_grid.SetInteractionActive( false );
 			yield return new WaitForSeconds( m_startDelay );
 
+			AssignPlayerIds();
 			SetPlayerOrder();
 			StartPlayerTurn( CurrentPlayer );
 
 			IsInitialized = true;
+		}
+
+		private void OnWon()
+		{
+			EndLosersTurns();
+		}
+
+		private void EndLosersTurns()
+		{
+			for ( int idx = 0; idx < m_users.Length; ++idx )
+			{
+				if ( idx == CurrentPlayer ) { continue; }
+
+				UserController loser = m_users[idx];
+				loser.EndTurn();
+			}
+		}
+
+		private void OnDraw()
+		{
+			EndAllTurns();
+		}
+
+		private void EndAllTurns()
+		{
+			for ( int idx = 0; idx < m_users.Length; ++idx )
+			{
+				UserController user = m_users[idx];
+				user.EndTurn();
+			}
+		}
+
+		private void AssignPlayerIds()
+		{
+			for ( int idx = 0; idx < m_users.Length; ++idx )
+			{
+				UserController user = m_users[idx];
+				user.SetId( idx );
+			}
 		}
 
 		private void SetPlayerOrder()
@@ -120,8 +166,8 @@ namespace ConnectFour
 		{
 			if ( m_gameoverHandler != null )
 			{
-				m_gameoverHandler.OnWonEvent -= OnWonEvent;
-				m_gameoverHandler.OnDrawEvent -= OnDrawEvent;
+				m_gameoverHandler.OnWonEvent -= OnWon;
+				m_gameoverHandler.OnDrawEvent -= OnDraw;
 			}
 		}
 	}
