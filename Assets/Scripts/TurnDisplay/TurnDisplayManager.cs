@@ -36,5 +36,13 @@ namespace ConnectFour.Gameplay
 		{
 			m_displays = GetComponentsInChildren<TurnDisplay>();
 		}
+
+		private void OnDestroy()
+		{
+			if ( GameManager.Exists )
+			{
+				Game.OnPlayerTurnChangedEvent -= OnPlayerTurnChanged;
+			}
+		}
 	}
 }
