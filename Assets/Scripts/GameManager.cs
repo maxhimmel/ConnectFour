@@ -55,17 +55,19 @@ namespace ConnectFour
 			}
 			else
 			{
-				CycleToNextTurn();
+				StartCoroutine( CycleToNextTurn() );
 			}
 		}
 
-		private void CycleToNextTurn()
+		private IEnumerator CycleToNextTurn()
 		{
 			UserController currentUser = m_users[CurrentPlayer];
 			currentUser.EndTurn();
 
-			CurrentPlayer = GetNextPlayer( CurrentPlayer );
+			// Wait a frame for animations and EventSystem to resolve ...
+			yield return null;
 
+			CurrentPlayer = GetNextPlayer( CurrentPlayer );
 			StartPlayerTurn( CurrentPlayer );
 		}
 
@@ -106,7 +108,7 @@ namespace ConnectFour
 
 			m_grid = GetComponentInChildren<GameGrid>();
 			m_gameoverHandler = GetComponentInChildren<GameoverHandler>();
-			m_users = GetComponentsInChildren<UserController>();
+			m_users = GetComponentsInChildren<UserController>( false );
 		}
 	}
 }
