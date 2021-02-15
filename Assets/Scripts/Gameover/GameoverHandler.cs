@@ -29,14 +29,12 @@ namespace ConnectFour.Gameplay
 			{
 				isGameover = true;
 
-				Debug.Log( $"Draw game!", this );
 				OnDrawEvent?.Invoke();
 			}
 			else if ( IsWinner( move.Row(), move.Col() ) )
 			{
 				isGameover = true;
 
-				Debug.Log( $"Player {game.CurrentPlayer} has won!", this );
 				OnWonEvent?.Invoke();
 			}
 
