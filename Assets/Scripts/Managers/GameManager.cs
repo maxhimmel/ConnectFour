@@ -11,6 +11,8 @@ namespace ConnectFour
 	public class GameManager : Singleton<GameManager>
 	{
 		public event System.Action<int> OnPlayerTurnChangedEvent;
+		public event System.Action OnWonEvent;
+		public event System.Action OnDrawEvent;
 
 		public bool IsInitialized { get; private set; } = false;
 		public bool IsGameover { get; private set; } = false;
@@ -86,13 +88,16 @@ namespace ConnectFour
 
 		private IEnumerator Start()
 		{
+			m_gameoverHandler.OnWonEvent += OnWonEvent;
+			m_gameoverHandler.OnDrawEvent += OnDrawEvent;
+
 			m_grid.SetInteractionActive( false );
 			yield return new WaitForSeconds( m_startDelay );
 
-			IsInitialized = true;
-
 			SetPlayerOrder();
 			StartPlayerTurn( CurrentPlayer );
+
+			IsInitialized = true;
 		}
 
 		private void SetPlayerOrder()
@@ -109,6 +114,15 @@ namespace ConnectFour
 			m_grid = GetComponentInChildren<GameGrid>();
 			m_gameoverHandler = GetComponentInChildren<GameoverHandler>();
 			m_users = GetComponentsInChildren<UserController>( false );
+		}
+
+		private void OnDestroy()
+		{
+			if ( m_gameoverHandler != null )
+			{
+				m_gameoverHandler.OnWonEvent -= OnWonEvent;
+				m_gameoverHandler.OnDrawEvent -= OnDrawEvent;
+			}
 		}
 	}
 }
