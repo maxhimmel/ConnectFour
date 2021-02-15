@@ -14,5 +14,11 @@ namespace ConnectFour.Utility
 			int nextLevel = (current.buildIndex + 1) % SceneManager.sceneCountInBuildSettings;
 			SceneManager.LoadScene( nextLevel, LoadSceneMode.Single );
 		}
+
+		public static void ReloadActiveScene()
+		{
+			Scene current = SceneManager.GetActiveScene();
+			SceneManager.LoadScene( current.buildIndex, LoadSceneMode.Single );
+		}
 	}
 }
