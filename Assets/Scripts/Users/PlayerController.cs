@@ -7,9 +7,13 @@ namespace ConnectFour.Gameplay.Users
 {
 	public class PlayerController : UserController
 	{
-		[SerializeField] protected float m_armDamping = 0.2f;
+		[Header( "Player Control" )]
+		[SerializeField] private float m_armDamping = 0.2f;
+		[SerializeField] private float m_celebrationDamping = 0.1f;
+		[SerializeField] private float m_maxCelebrationStrength = 5f;
 
 		private float m_armVelocity = 0;
+		private Vector3 m_celebrationVelocity = Vector3.zero;
 		private Coroutine m_selectingRoutine = null;
 
 		public override void StartTurn()
@@ -54,6 +58,36 @@ namespace ConnectFour.Gameplay.Users
 			base.EndTurn();
 
 			Game.Grid.SetInteractionActive( false );
+		}
+
+		protected override void OnWon()
+		{
+			base.OnWon();
+
+			IsThinking = false;
+			StopSelecting();
+
+			StartCoroutine( UpdateCelebration() );
+		}
+
+		private IEnumerator UpdateCelebration()
+		{
+			Vector3 prevMousePos = Input.mousePosition;
+			Vector3 smoothMousePos = prevMousePos;
+
+			while ( enabled )
+			{
+				Vector3 currentMousePos = Input.mousePosition;
+				smoothMousePos = Vector3.SmoothDamp( smoothMousePos, currentMousePos, ref m_celebrationVelocity, m_celebrationDamping );
+
+				Vector2 mouseDelta = Vector3.Max( smoothMousePos, prevMousePos ) - Vector3.Min( smoothMousePos, prevMousePos );
+				float mouseSpeed = Mathf.Min( mouseDelta.magnitude, m_maxCelebrationStrength );
+
+				prevMousePos = smoothMousePos;
+				m_arm.SetCelebrationStrength( mouseSpeed );
+
+				yield return null;
+			}
 		}
 
 		private void OnDisable()

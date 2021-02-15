@@ -4,6 +4,8 @@ using UnityEngine;
 
 namespace ConnectFour.Gameplay
 {
+	using Animation;
+
 	public class ArmAnimator : MonoBehaviour
 	{
 		public Vector2 AnchoredPos { get { return m_rectTransform.anchoredPosition; } }
@@ -14,14 +16,17 @@ namespace ConnectFour.Gameplay
 		private RectTransform m_rectTransform = null;
 		private RectTransform m_canvasRect = null;
 		private Coroutine m_movementRoutine = null;
+		private SineWaveRotator m_celebrationRotator = default;
 
-		public Vector2 GetCanvasPixelCoord( Vector2 pixelCoord )
+		public void StartCelebrating()
 		{
-			return new Vector2()
-			{
-				x = pixelCoord.x / Screen.width * m_canvasRect.rect.width,
-				y = pixelCoord.y / Screen.height * m_canvasRect.rect.height
-			};
+			StopMoving();
+			m_celebrationRotator.Play();
+		}
+
+		public void SetCelebrationStrength( float strength )
+		{
+			m_celebrationRotator.SetAmplitude( strength );
 		}
 
 		public void SetAnchoredPosition( Vector2 pixelCoord )
@@ -64,6 +69,15 @@ namespace ConnectFour.Gameplay
 			m_movementRoutine = null;
 		}
 
+		public Vector2 GetCanvasPixelCoord( Vector2 pixelCoord )
+		{
+			return new Vector2()
+			{
+				x = pixelCoord.x / Screen.width * m_canvasRect.rect.width,
+				y = pixelCoord.y / Screen.height * m_canvasRect.rect.height
+			};
+		}
+
 		private void OnDisable()
 		{
 			StopMoving();
@@ -75,6 +89,8 @@ namespace ConnectFour.Gameplay
 
 			Canvas parent = GetComponentInParent<Canvas>();
 			m_canvasRect = parent.transform as RectTransform;
+
+			m_celebrationRotator = GetComponent<SineWaveRotator>();
 		}
 	}
 }
