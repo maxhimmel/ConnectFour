@@ -27,10 +27,27 @@ namespace ConnectFour.Gameplay
 		private EventTrigger m_eventTrigger = null;
 		private ColorBlinker m_colorBlinker = null;
 
+		private Vector3[] m_worldCorners = new Vector3[4];
+
 		public void Config( int columnIndex, int maxFill )
 		{
 			ColumnIndex = columnIndex;
 			m_maxFill = maxFill;
+		}
+
+		public Vector2 GetPixelCoord()
+		{
+			RectTransform rect = transform as RectTransform;
+			rect.GetWorldCorners( m_worldCorners );
+
+			Vector3 min = m_worldCorners[0];
+			Vector3 max = m_worldCorners[2];
+			Rect pixelRect = new Rect(
+				min.x, min.y,
+				max.x - min.x, max.y - min.y
+			);
+
+			return pixelRect.center;
 		}
 
 		private void Start()

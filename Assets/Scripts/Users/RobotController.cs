@@ -6,8 +6,12 @@ namespace ConnectFour.Gameplay.Users
 {
 	public class RobotController : UserController
 	{
-		[SerializeField] private float m_decisionDelay = 0.5f;
-		[SerializeField] private float m_teaseDuration = 0.5f;
+		[SerializeField] private float m_teaseDuration = 0.7f;
+		[SerializeField] private float m_pauseAfterTeaseDuration = 0.25f;
+
+		[Space]
+		[SerializeField, Min( 0 )] private int m_minTeases = 2;
+		[SerializeField, Min( 0 )] private int m_maxTeases = 4;
 
 		public override void StartTurn()
 		{
@@ -18,41 +22,41 @@ namespace ConnectFour.Gameplay.Users
 
 		private IEnumerator UpdateDecision()
 		{
+			Column prevColumn = null;
 			List<Column> columns = GetValidColumns();
 
-			float decisionTimer = 0;
-			float teaseTimer = 0;
-
-			Column randColumn = columns[Random.Range( 0, columns.Count )];
-			randColumn.Highlight();
-
-			while ( decisionTimer < 1 )
+			int teaseCount = Random.Range( m_minTeases, m_maxTeases + 1 );
+			do
 			{
-				decisionTimer += Time.deltaTime / m_decisionDelay;
-				decisionTimer = Mathf.Clamp01( decisionTimer );
+				
+				int randIdx = Random.Range( 0, columns.Count );
+				Column randColumn = columns[randIdx];
 
-				teaseTimer += Time.deltaTime / m_teaseDuration;
-				teaseTimer = Mathf.Clamp01( teaseTimer );
-
-				if ( teaseTimer >= 1 )
+				if ( prevColumn != randColumn )
 				{
-					teaseTimer = 0;
-
-					Column prevColumn = randColumn;
-					randColumn = columns[Random.Range( 0, columns.Count )];
-
-					if ( randColumn != prevColumn )
+					if ( prevColumn != null )
 					{
 						prevColumn.Deselect();
-						randColumn.Highlight();
 					}
+
+					SelectColumn( randColumn );
 				}
 
-				yield return null;
-			}
+				if ( m_teaseDuration > 0 || m_pauseAfterTeaseDuration > 0 )
+				{
+					yield return new WaitForSeconds( m_teaseDuration + m_pauseAfterTeaseDuration );
+				}
 
-			randColumn.Deselect();
-			randColumn.PlacePiece();
+				prevColumn = randColumn;
+
+			} while ( --teaseCount > 0 );
+
+
+			if ( prevColumn != null )
+			{
+				prevColumn.Deselect();
+				prevColumn.PlacePiece();
+			}
 		}
 
 		private List<Column> GetValidColumns()
@@ -68,6 +72,18 @@ namespace ConnectFour.Gameplay.Users
 			}
 
 			return columns;
+		}
+
+		private void SelectColumn( Column column )
+		{
+			column.Highlight();
+
+			Vector2 columnPixelCoord = m_arm.GetCanvasPixelCoord( column.GetPixelCoord() );
+			m_arm.StartMoving( m_teaseDuration, new Vector2()
+			{
+				x = columnPixelCoord.x,
+				y = m_arm.AnchoredPos.y
+			} );
 		}
 	}
 }
