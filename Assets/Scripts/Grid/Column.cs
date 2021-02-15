@@ -40,8 +40,8 @@ namespace ConnectFour.Gameplay
 			RectTransform rect = transform as RectTransform;
 			rect.GetWorldCorners( m_worldCorners );
 
-			Vector3 min = m_worldCorners[0];
-			Vector3 max = m_worldCorners[2];
+			Vector3 min = MainCamera.Cam.WorldToScreenPoint( m_worldCorners[0] );
+			Vector3 max = MainCamera.Cam.WorldToScreenPoint( m_worldCorners[2] );
 			Rect pixelRect = new Rect(
 				min.x, min.y,
 				max.x - min.x, max.y - min.y
