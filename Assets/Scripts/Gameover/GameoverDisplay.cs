@@ -23,14 +23,28 @@ namespace ConnectFour.Gameplay
 		[Header( "References" )]
 		[SerializeField] private ParticleSystem m_celebrationVfx = default;
 		[SerializeField] private CanvasGroupFader m_displayFader = default;
+
+		[Space]
 		[SerializeField] private TMP_Text m_gameoverMessageElement = default;
+		[SerializeField] private SineWaveRotator m_messageRotator = default;
 
 		private void Start()
 		{
-			Game.OnWonEvent += OnWon;
 			Game.OnDrawEvent += OnDraw;
+			Game.OnWonEvent += OnWon;
 
 			m_displayFader.FadeOut( 0 );
+		}
+
+		private void OnDraw()
+		{
+			ShowMessage( m_drawMessage );
+		}
+
+		private void ShowMessage( string message )
+		{
+			m_displayFader.FadeIn( m_showDuration );
+			m_gameoverMessageElement.text = message;
 		}
 
 		private void OnWon()
@@ -38,6 +52,7 @@ namespace ConnectFour.Gameplay
 			SetVfxColors( Game.GetPlayerColor( Game.CurrentPlayer ) );
 			ShowMessage( m_winMessage );
 
+			m_messageRotator.Play();
 			m_celebrationVfx.Play( true );
 		}
 
@@ -55,23 +70,12 @@ namespace ConnectFour.Gameplay
 			particleModule.startColor = new ParticleSystem.MinMaxGradient( color, m_bgColor );
 		}
 
-		private void OnDraw()
-		{
-			ShowMessage( m_drawMessage );
-		}
-
-		private void ShowMessage( string message )
-		{
-			m_displayFader.FadeIn( m_showDuration );
-			m_gameoverMessageElement.text = message;
-		}
-
 		private void OnDestroy()
 		{
 			if ( GameManager.Exists )
 			{
-				Game.OnWonEvent -= OnWon;
 				Game.OnDrawEvent -= OnDraw;
+				Game.OnWonEvent -= OnWon;
 			}
 		}
 	}
