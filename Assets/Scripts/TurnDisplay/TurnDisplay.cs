@@ -7,6 +7,8 @@ namespace ConnectFour.Gameplay
 {
 	public class TurnDisplay : MonoBehaviour
 	{
+		public bool IsShowingOrHiding { get { return m_showHideRoutine != null; } }
+
 		private GameManager Game { get { return GameManager.Instance; } }
 		
 		[SerializeField] private Image m_display = default;
