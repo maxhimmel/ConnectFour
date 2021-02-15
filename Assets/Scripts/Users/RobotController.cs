@@ -32,6 +32,12 @@ namespace ConnectFour.Gameplay.Users
 				int randIdx = Random.Range( 0, columns.Count );
 				Column randColumn = columns[randIdx];
 
+				if ( teaseCount <= 0 )
+				{
+					// For the final choice let's always pick the best move ...
+					randColumn = GetBestColumn( columns );
+				}
+
 				if ( prevColumn != randColumn )
 				{
 					if ( prevColumn != null )
@@ -72,6 +78,12 @@ namespace ConnectFour.Gameplay.Users
 			}
 
 			return columns;
+		}
+
+		private Column GetBestColumn( List<Column> columns )
+		{
+			int randIdx = Random.Range( 0, columns.Count );
+			return columns[randIdx];
 		}
 
 		private void SelectColumn( Column column )
